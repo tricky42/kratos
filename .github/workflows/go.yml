@@ -16,10 +16,11 @@ jobs:
 
   mymagic:
     runs-on: ubuntu-latest
-    container: oryd/xgoreleaser:1.14.4-0.138.0
-      env:
+    container: 
+      image: oryd/xgoreleaser:1.14.4-0.138.0
+      env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       volumes: 
         - /home/runner/work/_temp/_github_home:/go
     steps:
-    - run: release --skip-publish
+      - run: release --config .goreleaser_simple.yml --skip-publish
