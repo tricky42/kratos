@@ -7,15 +7,6 @@ on:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-  mymagic:
-    runs-on: ubuntu-latest
     container: 
       image: oryd/xgoreleaser:1.14.4-0.138.0
       env: 
@@ -24,4 +15,9 @@ jobs:
         - /home/runner/work/kratos/kratos:/go
       options: --entrypoint /bin/bash
     steps:
-      - run: pwd && ls -la
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: goreleaser release --config .goreleaser_simple.yml --skip-publish
