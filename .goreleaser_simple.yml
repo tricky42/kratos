@@ -1,0 +1,140 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+project_name: kratos
+
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - go mod download
+    - go install github.com/gobuffalo/packr/v2/packr2 github.com/markbates/pkger/cmd/pkger
+    - packr2
+    - pkger
+
+builds:
+  -
+    id: kratos-sqlite-linux-libmusl
+    flags:
+      - -tags
+      - sqlite
+    ldflags:
+      - -s -w -X github.com/ory/kratos/cmd.BuildVersion={{.Tag}} -X github.com/ory/kratos/cmd.BuildGitHash={{.FullCommit}} -X github.com/ory/kratos/cmd.BuildTime={{.Date}}
+    binary: kratos
+    env:
+      - CGO_ENABLED=1
+      - CC=musl-gcc
+    goarch:
+      - amd64
+    goos:
+      - linux
+  -
+    id: kratos
+    ldflags:
+      - -s -w -X github.com/ory/kratos/cmd.BuildVersion={{.Tag}} -X github.com/ory/kratos/cmd.BuildGitHash={{.FullCommit}} -X github.com/ory/kratos/cmd.BuildTime={{.Date}}
+    binary: kratos
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+    goos:
+      - linux
+    
+archives:
+  - id: kratos-sqlite
+    builds:
+      - kratos-sqlite-linux
+    replacements:
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
+    format_overrides:
+      -
+        goos: windows
+        format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
+    name_template: "{{ .ProjectName }}_{{ .Version }}-sqlite_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+
+  - id: kratos-sqlite-libmusl
+    builds:
+      - kratos-sqlite-linux-libmusl
+    replacements:
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
+    format_overrides:
+      -
+        goos: windows
+        format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
+    name_template: "{{ .ProjectName }}_{{ .Version }}-sqlite-libmusl_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+
+  - id: kratos
+    builds:
+      - kratos
+    replacements:
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - ci skip
+      - Merge pull request
+      - Merge branch
+
+dockers:
+  - dockerfile: .docker/Dockerfile-sqlite
+    builds:
+      - kratos-sqlite-linux-libmusl
+    binaries:
+      - kratos
+    image_templates:
+      - "tricky42/kratos:v{{ .Major }}-sqlite"
+      - "tricky42/kratos:v{{ .Major }}.{{ .Minor }}-sqlite"
+      - "tricky42/kratos:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-sqlite"
+      - "tricky42/kratos:{{.Tag}}-sqlite"
+      - "tricky42/kratos:latest-sqlite"
+  - dockerfile: .docker/Dockerfile
+    builds:
+      - kratos
+    binaries:
+      - kratos
+    image_templates:
+      - "tricky42/kratos:v{{ .Major }}"
+      - "tricky42/kratos:v{{ .Major }}.{{ .Minor }}"
+      - "tricky42/kratos:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "tricky42/kratos:{{.Tag}}"
+      - "tricky42/kratos:latest"
+
+release:
+  prerelease: auto
+  name_template: "{{.Tag}}"
+  ids:
+    - kratos-sqlite
+    - kratos-sqlite-libmusl
+    - kratos
