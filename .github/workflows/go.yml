@@ -24,4 +24,4 @@ jobs:
         - /home/runner/work/kratos/kratos:/go
       options: --entrypoint /bin/bash
     steps:
-      - run: release --config .goreleaser_simple.yml --skip-publish
+      - run: goreleaser release --config .goreleaser_simple.yml --skip-publish
