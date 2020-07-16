@@ -21,6 +21,8 @@ jobs:
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       volumes: 
-        - /home/runner/work/_temp/_github_home:/go
+        - /home/runner/work/kratos/kratos:/go
+      options:
+        - --entrypoint /bin/bash
     steps:
       - run: release --config .goreleaser_simple.yml --skip-publish
