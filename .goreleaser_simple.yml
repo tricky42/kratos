@@ -135,6 +135,5 @@ release:
   prerelease: auto
   name_template: "{{.Tag}}"
   ids:
-    - kratos-sqlite
     - kratos-sqlite-libmusl
     - kratos
