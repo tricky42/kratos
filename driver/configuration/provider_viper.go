@@ -34,6 +34,8 @@ var _ Provider = new(ViperProvider)
 
 const DefaultBrowserReturnURL = "default_browser_return_url"
 
+const DefaultSQLiteMemoryDSN = "sqlite://:memory:?_fk=true"
+
 const (
 	ViperKeyDSN = "dsn"
 
@@ -52,7 +54,9 @@ const (
 	ViperKeyAdminHost     = "serve.admin.host"
 
 	ViperKeySessionLifespan = "session.lifespan"
-	ViperKeySessionSameSite = "session.cookie_same_site"
+	ViperKeySessionSameSite = "session.cookie.same_site"
+	ViperKeySessionDomain   = "session.cookie.domain"
+	ViperKeySessionPath     = "session.cookie.path"
 
 	ViperKeySelfServiceStrategyConfig = "selfservice.strategies"
 
@@ -104,6 +108,14 @@ func HookStrategyKey(key, strategy string) string {
 
 func NewViperProvider(l *logrusx.Logger, dev bool) *ViperProvider {
 	return &ViperProvider{l: l, dev: dev}
+}
+
+func (p *ViperProvider) SessionDomain() string {
+	return viperx.GetString(p.l, ViperKeySessionDomain, "")
+}
+
+func (p *ViperProvider) SessionPath() string {
+	return viperx.GetString(p.l, ViperKeySessionPath, "")
 }
 
 func (p *ViperProvider) HasherArgon2() *HasherArgon2Config {
@@ -170,7 +182,7 @@ func (p *ViperProvider) DSN() string {
 	dsn := viperx.GetString(p.l, ViperKeyDSN, "")
 
 	if dsn == "memory" {
-		return "sqlite://mem.db?mode=memory&_fk=true&cache=shared"
+		return DefaultSQLiteMemoryDSN
 	}
 
 	if len(dsn) > 0 {
