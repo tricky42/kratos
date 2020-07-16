@@ -14,12 +14,12 @@ jobs:
         with:
           fetch-depth: 0
 
-  mymagic: 
-    container: 
-      image: oryd/xgoreleaser:latest
+  mymagic:
+    runs-on: ubuntu-latest
+    container: oryd/xgoreleaser:1.14.4-0.138.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       volumes: 
-        - "/home/runner/work/_temp/_github_home":"/go"
+        - /home/runner/work/_temp/_github_home:/go
     steps:
     - run: release --skip-publish
