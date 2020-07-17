@@ -9,7 +9,7 @@ before:
   hooks:
     - go mod download
     - go install github.com/gobuffalo/packr/v2/packr2 
-    - go install github.com/markbates/pkger/cmd/pkger
+    - go install stream vrgithub.com/markbates/pkger/cmd/pkger
     - packr2
     - pkger
 
