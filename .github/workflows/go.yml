@@ -26,4 +26,4 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.14
-      - run: goreleaser release --config .goreleaser_simple.yml --skip-publish
+      - run: goreleaser release --config .goreleaser_simple.yml
